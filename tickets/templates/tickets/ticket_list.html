@@ -1,0 +1,138 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4 px-md-5" style="direction: rtl; text-align: right;">
+
+    <!-- هدر صفحه -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-white mb-1">میز کار تیکت‌ها</h2>
+            <p style="color: #a0aec0; font-size: 0.9rem;">مدیریت و پیگیری درخواست‌های شما</p>
+        </div>
+        <a href="{% url 'ticket_create' %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> ثبت درخواست جدید
+        </a>
+    </div>
+
+    <!-- جدول با تم تیره اصلاح شده -->
+    <div class="card border-0 shadow-lg" style="background: #1a202c; border-radius: 20px; overflow: hidden; border: 1px solid #2d3748 !important;">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background-color: transparent !important;">
+                <thead>
+                    <tr style="background: rgba(45, 55, 72, 0.5); color: #e2e8f0; border-bottom: 2px solid #2d3748;">
+                        <th class="py-4 px-4 text-center" style="width: 80px;">عملیات</th>
+                        <th class="py-4">وضعیت</th>
+                        <th class="py-4">موضوع تیکت</th>
+                        <th class="py-4">فرستنده</th>
+                        <th class="py-4">اولویت</th>
+                        <th class="py-4">تاریخ ثبت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr style="border-bottom: 1px solid #2d3748; vertical-align: middle;">
+                        <td class="text-center px-4">
+                            <a href="{% url 'ticket_detail' ticket.id %}" class="btn-view" title="مشاهده">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                        <td>
+                            {% if ticket.status == 'OPEN' %}
+                                <span class="badge-custom status-open">باز</span>
+                            {% else %}
+                                <span class="badge-custom status-closed">بسته</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="fw-bold text-white">{{ ticket.title }}</div>
+                            <div style="color: #718096; font-size: 0.8rem;">کد: #{{ ticket.id }}</div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-small">
+                                    {{ ticket.created_by.username|slice:":1"|upper }}
+                                </div>
+                                <span class="ms-2 fw-medium text-white">{{ ticket.created_by.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if ticket.priority == 'URGENT' %}
+                                <span style="color: #fc8181;"><i class="bi bi-lightning-fill me-1"></i> فوری</span>
+                            {% elif ticket.priority == 'MEDIUM' %}
+                                <span style="color: #f6ad55;"><i class="bi bi-info-circle me-1"></i> متوسط</span>
+                            {% else %}
+                                <span style="color: #63b3ed;"><i class="bi bi-arrow-down me-1"></i> کم</span>
+                            {% endif %}
+                        </td>
+                        <td style="color: #a0aec0; font-size: 0.85rem;">
+                            {{ ticket.created_at|date:"Y/m/d" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5" style="color: #718096;">تیکتی جهت نمایش وجود ندارد.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* حذف رنگ سفید پیش‌فرض بوت‌استرپ */
+    .table-dark {
+        --bs-table-bg: transparent !important;
+        --bs-table-hover-bg: rgba(255, 255, 255, 0.03) !important;
+        color: white !important;
+    }
+
+    /* استایل آواتار */
+    .avatar-small {
+        width: 32px;
+        height: 32px;
+        background: #4a5568;
+        color: #fbd38d; /* رنگ طلایی برای حرف اول */
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border: 1px solid #718096;
+    }
+
+    /* دکمه مشاهده تیکت */
+    .btn-view {
+        color: #63b3ed;
+        font-size: 1.2rem;
+        transition: 0.3s;
+    }
+    .btn-view:hover {
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    /* نشان‌های وضعیت */
+    .badge-custom {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+    .status-open {
+        background: rgba(72, 187, 120, 0.2);
+        color: #68d391;
+        border: 1px solid rgba(72, 187, 120, 0.3);
+    }
+    .status-closed {
+        background: rgba(160, 174, 192, 0.2);
+        color: #a0aec0;
+    }
+
+    /* اصلاح فونت و فواصل برای فارسی */
+    body {
+        background-color: #0f172a !important; /* پس‌زمینه کل صفحه */
+    }
+</style>
+{% endblock %}

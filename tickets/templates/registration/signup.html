@@ -1,0 +1,166 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<style>
+    .signup-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        border: 1px solid #334155;
+    }
+
+    .signup-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .signup-header h2 {
+        color: #3b82f6;
+        margin-bottom: 10px;
+    }
+
+    .signup-header p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* استایل دادن به فیلدهای فرم که از جنگو میان */
+    .signup-form p {
+        margin-bottom: 20px;
+    }
+
+    .signup-form label {
+        display: block;
+        margin-bottom: 8px;
+        color: #f1f5f9;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .signup-form input, .signup-form select {
+        width: 100%;
+        padding: 12px;
+        background: #0f172a !important;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        color: white !important;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    .signup-form input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    /* فارسی کردن متون راهنمای پسورد و خطاها */
+    .helptext, .errorlist {
+        display: block;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 5px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .errorlist li {
+        color: #ef4444;
+    }
+
+    .btn-signup {
+        width: 100%;
+        padding: 14px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-signup:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.85rem;
+    }
+
+    .login-link a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+</style>
+
+<div class="signup-container">
+    <div class="signup-header">
+        <h2>ایجاد حساب کاربری ✨</h2>
+        <p>لطفاً اطلاعات زیر را برای ثبت‌نام در سامانه پشتیبانی وارد کنید</p>
+    </div>
+
+    <form method="post" class="signup-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {% if field.name == 'username' %}نام کاربری
+                    {% elif field.name == 'full_name' %}نام و نام خانوادگی
+                    {% elif field.name == 'gender' %}جنسیت
+                    {% elif field.name == 'work_location' %}محل کار
+                    {% elif field.name == 'job_title' %}سمت شغلی
+                    {% elif field.name == 'password1' %}رمز عبور
+                    {% elif field.name == 'password2' %}تکرار رمز عبور
+                    {% else %}{{ field.label }}{% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="helptext">
+                        {% if field.name == 'password1' %}
+                            رمز باید حداقل ۸ کاراکتر باشد.
+                        {% else %}
+                            {{ field.help_text|safe }}
+                        {% endif %}
+                    </small>
+                {% endif %}
+
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <br>
+        {% endfor %}
+
+        <button type="submit" class="btn-signup">ثبت‌نام و عضویت</button>
+    </form>
+
+    <div class="login-link">
+        <span style="color: #94a3b8;">قبلاً ثبت‌نام کرده‌اید؟</span>
+        <a href="{% url 'login' %}">وارد شوید</a>
+    </div>
+</div>
+
+<script>
+    // یک ترفند کوچک برای حذف نوشته‌های انگلیسی پیش‌فرض جنگو در پسورد
+    document.querySelectorAll('.helptext').forEach(el => {
+        if(el.textContent.includes('Your password can\'t')) {
+            el.innerHTML = 'رمز شما نباید خیلی شبیه به اطلاعات شخصی باشد و حداقل باید ۸ کاراکتر باشد.';
+        }
+    });
+</script>
+{% endblock %}

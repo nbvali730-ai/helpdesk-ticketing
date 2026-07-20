@@ -1,0 +1,41 @@
+{% extends "tickets/base.html" %}
+{% block title %}Manage Ticket #{{ ticket.id }}{% endblock %}
+
+{% block content %}
+  <h1>Manage Ticket #{{ ticket.id }}: {{ ticket.title }}</h1>
+  
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      Status: 
+      <select name="status">
+        {% for value, label in statuses %}
+          <option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <p>
+      Assign To:
+      <select name="assigned_to">
+        <option value="">-- Unassigned --</option>
+        {% for u in users %}
+          <option value="{{ u.id }}" {% if ticket.assigned_to == u %}selected{% endif %}>{{ u.username }}</option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <p>Add Internal Note:</p>
+    <textarea name="body" rows="3" cols="50"></textarea>
+    <br>
+    <button type="submit">Update Ticket</button>
+  </form>
+
+  <hr>
+  <h3>Message History</h3>
+  {% for m in ticket.messages.all %}
+    <div style="border:1px solid #ddd; padding:10px; margin:5px 0;">
+      <b>{{ m.author.username }}</b>: {{ m.body }}
+    </div>
+  {% endfor %}
+{% endblock %}
